@@ -10,7 +10,6 @@ Example script to change the network of the Virtual Machine NIC
 """
 
 import atexit
-import getpass
 
 from tools import cli
 from tools import tasks
@@ -32,22 +31,11 @@ def get_obj(content, vimtype, name):
     return obj
 
 
-def str2bool(v):
-    """
-    String to Bool function
-    """
-    return v.lower() in ("yes", "true", "t", "1")
-
-
 def get_args():
     """Get command line args from the user.
     """
 
     parser = cli.build_arg_parser()
-    parser.add_argument('-c', '--datacenter',
-                        required=False,
-                        action='store',
-                        help='Datacenter Name')
     parser.add_argument('-v', '--vm_uuid',
                         required=False,
                         action='store',
@@ -59,15 +47,12 @@ def get_args():
                         help='Name of the network/portgroup')
 
     parser.add_argument('-d', '--is_VDS',
-                        type=str2bool,
+                        action="store_true",
+                        default=False,
                         help='The provided network is in VSS or VDS')
 
     args = parser.parse_args()
-
-    if not args.password:
-        args.password = getpass.getpass(
-            prompt='Enter password for host %s and user %s: ' %
-                   (args.host, args.user))
+    cli.prompt_for_password(args)
     return args
 
 
@@ -86,12 +71,7 @@ def main():
 
         atexit.register(connect.Disconnect, service_instance)
         content = service_instance.RetrieveContent()
-        for child in content.rootFolder.childEntity:
-            if hasattr(child, 'hostFolder'):
-                datacenter = child
-                if datacenter.name == args.datacenter:
-                    break
-        vm = content.searchIndex.FindByUuid(datacenter, args.vm_uuid, True)
+        vm = content.searchIndex.FindByUuid(None, args.vm_uuid, True)
         # This code is for changing only one Interface. For multiple Interface
         # Iterate through a loop of network names.
         device_change = []
