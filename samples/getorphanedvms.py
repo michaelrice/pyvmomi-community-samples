@@ -6,7 +6,7 @@ are still taking up datastore space, but not currently
 being used.
 
 Issues:
-    Currently only works with Windows based vCenter servers.
+    Currently works with Windows based vCenter servers only.
     Still working on vCenter Server Appliance
 
 Example:
@@ -38,8 +38,6 @@ def updatevmx_path():
     VMX_PATH = []
 
 
-
-
 def url_fix(s, charset='utf-8'):
     """
     function to fix any URLs that have spaces in them
@@ -57,8 +55,9 @@ def url_fix(s, charset='utf-8'):
 def get_args():
     """
     Supports the command-line arguments listed below.
-    function to parse through args for connecting to ESXi host or vCenter server
-    function taken from getallvms.py script from pyvmomi github repo
+    function to parse through args for connecting to ESXi host or
+    vCenter server function taken from getallvms.py script
+    from pyvmomi github repo
     """
     parser = argparse.ArgumentParser(
         description='Process args for retrieving all the Virtual Machines')
@@ -76,8 +75,6 @@ def get_args():
         help='Password to use when connecting to host')
     args = parser.parse_args()
     return args
-
-
 
 
 def find_vmx(dsbrowser, dsname, datacenter, fulldsname):
@@ -107,9 +104,6 @@ def find_vmx(dsbrowser, dsname, datacenter, fulldsname):
             except Exception, e:
                 print "Caught exception : " + str(e)
                 return -1
-
-
-
 
 
 def examine_vmx(dsname):
@@ -157,7 +151,6 @@ def examine_vmx(dsname):
         print "Caught exception : " + str(e)
 
 
-
 def getvm_info(vm, depth=1):
     """
     Print information for a particular virtual machine or recurse
@@ -191,11 +184,11 @@ def getvm_info(vm, depth=1):
         return -1
 
 
-
 def find_match(uuid):
     """
     function takes vc.uuid from the vmx file and the instance uuid from
-    the inventory VM and looks for match if no match is found it is printed out.
+    the inventory VM and looks for match if no match is found
+    it is printed out.
     """
     a = 0
     for temp in INV_VM:
@@ -203,7 +196,6 @@ def find_match(uuid):
             a = a+1
     if a < 1:
         print DS_VM[uuid]
-
 
 
 def main():
@@ -236,12 +228,13 @@ def main():
         vmlist = vmfolder.childEntity
         dsvmkey = []
 
-        # each datastore found on ESXi host or vCenter is passed to the find_vmx
-        # and examine_vmx functions to find all VMX files and search them
+        # each datastore found on ESXi host or vCenter is passed
+        # to the find_vmx and examine_vmx functions to find all
+        # VMX files and search them
 
         for ds in datastores:
             find_vmx(ds.browser, "[%s]" % ds.summary.name, datacenter.name,
-                ds.summary.name)
+                     ds.summary.name)
             examine_vmx(ds.summary.name)
             updatevmx_path()
 
